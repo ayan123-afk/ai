@@ -6,9 +6,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  if (req.method === "OPTIONS") {
-    return res.status(204).end();
-  }
+  if (req.method === "OPTIONS") return res.status(204).end();
 
   const prompt =
     req.method === "POST"
@@ -20,29 +18,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const COHERE_KEY = process.env.COHERE_API_KEY;
+    // ✅ Your PHP backend call
+    const phpUrl = `https://zappymods.ct.ws/api/ai.php?prompt=${encodeURIComponent(
+      prompt
+    )}`;
 
-    // ✅ new Cohere Chat API endpoint
-    const resp = await fetch("https://api.cohere.ai/v1/chat", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${COHERE_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "command-r", // or "command-r-plus" if available
-        message: prompt,
-      }),
-    });
-
+    const resp = await fetch(phpUrl);
     const data = await resp.json();
 
-    // ✅ Chat API returns response.text field
-    const text = data.text?.trim() || JSON.stringify(data, null, 2);
+    // Adjust according to your PHP response
+    const text = data.reply || data.output || JSON.stringify(data);
 
     res.status(200).json({ ok: true, output: text });
   } catch (err) {
-    console.error("API error:", err);
+    console.error("Proxy API error:", err);
     res.status(500).json({ error: err.message });
   }
 }
