@@ -28,25 +28,23 @@ export default async function handler(req, res) {
     // const data = await resp.json();
 
     // ===== OPTION 2: Direct call to Cohere API (recommended if you own key) =====
-    const COHERE_KEY = process.env.COHERE_API_KEY; // set in .env or vercel dashboard
-    const resp = await fetch("https://api.cohere.ai/v1/generate", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${COHERE_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "command-r-plus",
-        prompt: prompt,
-        max_tokens: 100,
-      }),
-    });
+    const COHERE_KEY = process.env.COHERE_API_KEY;
+const resp = await fetch("https://api.cohere.ai/v1/generate", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${COHERE_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: "command-r-plus",
+    prompt: prompt,
+    max_tokens: 100,
+  }),
+});
+const data = await resp.json();
+const text = data.generations?.[0]?.text?.trim() || "No response";
+res.status(200).json({ ok: true, output: text });
 
-    const data = await resp.json();
-    // Extract text
-    const text = data.generations?.[0]?.text?.trim() || "No response";
-
-    res.status(200).json({ ok: true, output: text });
   } catch (err) {
     console.error("API error:", err);
     res.status(500).json({ error: err.message });
