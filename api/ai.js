@@ -13,18 +13,21 @@ export default async function handler(req, res) {
     const COHERE_API_KEY = process.env.COHERE_API_KEY;
 
     // Make a request to Cohere API
-    const response = await fetch("https://api.cohere.ai/generate", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${COHERE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "xlarge",      // example model
-        prompt: prompt,
-        max_tokens: 100,
-      }),
-    });
+    const response = await fetch("https://api.cohere.ai/v2/chat", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${COHERE_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: "command-a-03-2025",      // ya jis model ka aap use kar rahe hain
+    messages: [
+      { role: "user", content: prompt }
+    ],
+    max_tokens: 100
+  }),
+});
+
 
     const data = await response.json();
 
