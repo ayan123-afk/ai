@@ -1,16 +1,16 @@
-// pages/api/ai.js
 import fetch from "node-fetch";
 
 export default async function handler(req, res) {
+  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
   if (req.method === "OPTIONS") return res.status(204).end();
 
-  let prompt =
-    req.method === "POST" ? req.body.prompt : req.query.prompt;
-  if (!prompt || !prompt.trim()) prompt = "Hello world";
+  // Get prompt safely
+  let prompt = req.method === "POST" ? req.body.prompt : req.query.prompt;
+  if (!prompt || !prompt.trim()) prompt = "Hello world"; // default fallback
 
   try {
     const COHERE_KEY = process.env.COHERE_API_KEY;
@@ -23,7 +23,9 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "command-r-plus-08-2024",
-        messages: [{ role: "user", content: prompt.trim() }],
+        messages: [
+          { role: "user", content: prompt.trim() } // trim to avoid empty content
+        ],
         max_tokens: 150,
         temperature: 0.7
       }),
@@ -31,7 +33,7 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Extract assistant message safely
+    // Extract assistant response safely
     const text =
       data.choices?.[0]?.message?.content?.trim() ||
       JSON.stringify(data, null, 2);
