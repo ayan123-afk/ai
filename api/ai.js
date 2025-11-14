@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     const data = await response.json();
 
     // Sirf assistant ka text extract karo
-    const aiText = data?.message?.content?.[0]?.text || "No response from AI";
+    const aiText = data?.message?.content?.[0]?.text || "API Key Not Respoding";
 
     // ✅ Return JSON
     res.status(200).json({ result: aiText });
